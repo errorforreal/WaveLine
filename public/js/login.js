@@ -20,13 +20,13 @@ loginForm.addEventListener('submit', async (e)=>{
         const data = await res.json();
 
         if(!res.ok){
-            throw new Error(data.error)
+            throw new Error(data.message)
         }
 
         localStorage.setItem('authToken', data.loginToken);
         
 
-        window.location.href = '/home.html';
+        window.location.href = '/dashboard.html';
     }
     catch(err){
         console.log(err);

@@ -20,7 +20,7 @@ form.addEventListener('submit',async (e)=>{
         const data = await res.json();
 
         if(!res.ok){
-            throw new Error(data.error); 
+            throw new Error(data.message); 
         }
 
         window.location.href = '/login.html';

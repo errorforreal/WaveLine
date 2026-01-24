@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WaveLink Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./css/dashboard.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    
+
+    <nav class="sidebar-nav">
+      <button class="sidebar-btn active" data-view="communication">💬</button>
+      <button class="sidebar-btn" data-view="protocols">🔗</button>
+      <button class="sidebar-btn" data-view="collections">📁</button>
+      <button class="sidebar-btn" data-view="settings">⚙️</button>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-panel">
+
+    <!-- Top Bar -->
+    <header class="top-bar is-disconnected" id="connectionBar">
+      <div class="connection-left">
+        <input
+          id="wsUrlInput"
+          class="ws-url-input"
+          placeholder="ws://localhost:3000"
+          autocomplete="off"
+          required
+        />
+        <span class="connection-indicator" id="connectionStatus">
+          ● Disconnected
+        </span>
+      </div>
+
+      <div class="connection-actions">
+        <button class="btn btn-primary" id="connectBtn" onclick="connect()">Connect</button>
+        <button class="btn btn-danger" id="disconnectBtn"  onclick="disconnect()" disabled>
+          Disconnect
+        </button>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab active" data-tab="communication">Communication</button>
+      <button class="tab" data-tab="protocols">Protocols</button>
+    </div>
+
+    <!-- Content -->
+    <section class="content">
+
+      <!-- Composer -->
+      <section class="composer-panel">
+        <header class="panel-header">
+          <span>Message</span>
+
+          <select id="messageFormat" class="message-format">
+            <option value="text">Text</option>
+            <option value="json">JSON</option>
+          </select>
+        </header>
+
+        <textarea
+          id="messageInput"
+          class="message-input"
+          placeholder="Type message to send…"
+          required
+        ></textarea>
+
+        <footer class="panel-footer">
+          <button class="btn btn-primary" id="sendBtn" onclick="sendMessage()"  disabled>
+            Send
+          </button>
+        </footer>
+      </section>
+
+      <!-- Logs -->
+      <section class="log-panel">
+        <header class="panel-header">
+          <span>Log</span>
+
+          <div class="panel-actions">
+            <button class="icon-btn" id="clearLogsBtn">🗑️</button>
+          </div>
+        </header>
+
+        <div class="log-list" id="logList">
+          <!-- Logs injected here -->
+        </div>
+      </section>
+
+    </section>
+
+    <div id="errorBox" class="error hidden"></div>
+  </main>
+</div>
+
+
+
+<script src="./js/dashboard.js"></script>
+</body>
+</html>
