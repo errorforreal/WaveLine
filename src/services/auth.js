@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {jwtSecret, jwtExpiresIn} = require('../config/env');
+
 
 function generateToken(user){
     const payload = {
@@ -8,13 +8,14 @@ function generateToken(user){
         role : user.role
     }
 
-    return jwt.sign(payload,jwtSecret, {
-        expiresIn : jwtExpiresIn || '1d'
-    });
+    return jwt.sign(payload,
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
 }
 
 function verifyToken(token){
-    return jwt.verify(token, jwtSecret);
+    return jwt.verify(token, process.env.JWT_SECRET);
 }
 
 module.exports = {
