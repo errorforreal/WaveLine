@@ -1,4 +1,4 @@
-const Connection = require('../models/connection');
+const connectionReq = require('../models/connection');
 const { generateConnectionId } = require('../src/services/connectionID');
 const connectToWs = require('../modules/connection/ws-client');
 
@@ -9,13 +9,16 @@ async function handleConnection(req,res){
     try{
        
         const id = generateConnectionId();
-        const connection = await Connection.create({
+        const ConnectionReq = await connectionReq.create({
             connectionId : id,
             createdBy : req.user._id,
             wsUrl : wsUrl
         })
 
-         res.status(200).json({connectionId : id});
+         res.status(200).json({
+            connectionId : id,
+            message : 'Connection in progress'
+        });
          connectToWs(wsUrl , id);
     }
     catch(error){
