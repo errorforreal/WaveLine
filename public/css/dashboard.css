@@ -306,4 +306,10 @@
     border-color: var(--danger);
     color: var(--danger);
   }
+
+
+  .is-disconnecting .connection-indicator {
+    color: var(--danger);
+  }
+  
   

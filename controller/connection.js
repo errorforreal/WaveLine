@@ -1,6 +1,9 @@
 const connectionReq = require('../models/connection');
 const { generateConnectionId } = require('../src/services/connectionID');
-const connectToWs = require('../modules/connection/ws-client');
+const { connectToWs, disconnectWs} = require('../modules/connection/ws-client');
+const {removeSocket, getSocket} = require('../src/services/connectionID');
+
+
 
 async function handleConnection(req,res){
 
@@ -19,6 +22,7 @@ async function handleConnection(req,res){
             connectionId : id,
             message : 'Connection in progress'
         });
+
          connectToWs(wsUrl , id);
     }
     catch(error){
@@ -31,4 +35,26 @@ async function handleConnection(req,res){
 
 }
 
-module.exports = handleConnection;
+async function handleDisconnect(req,res){
+    const Id = req.params.id;
+
+    try{
+       res.json({
+        message : 'Disconnecting'
+       })
+
+       disconnectWs(Id);
+    }
+    catch(error){
+        res.status(500).json({
+            message : 'Internal Server Error'
+        })
+    }
+    
+
+}
+
+module.exports =  {
+    handleConnection,
+    handleDisconnect
+}

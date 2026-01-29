@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-const {addSocket, removeSocket} = require('../../src/services/connectionID');
+const {addSocket, removeSocket, getSocket} = require('../../src/services/connectionID');
 const connection = require('../../models/connection');
 
 
@@ -41,4 +41,24 @@ async function connectToWs(wsUrl, connectionId){
         
 }
 
-module.exports = connectToWs;
+async function disconnectWs(connectionId){
+    const ws = getSocket(connectionId);
+
+    try{
+        ws.close();
+
+        await connection.updateOne({connectionId},{
+            status : 'DISCONNECTED'
+        })
+        removeSocket(connectionId);
+    }
+    catch(error){
+        console.log(error);
+        
+    }
+}
+
+module.exports = {
+    connectToWs,
+    disconnectWs
+}

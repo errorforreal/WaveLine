@@ -1,3 +1,6 @@
+let activeConnectionId = null;
+
+
 async function connect(){
 
     setConnectingUI();
@@ -23,13 +26,13 @@ async function connect(){
             
         }
 
-        const connectionId = data.connectionId;
+        activeConnectionId = data.connectionId;
         let status = null;
         let attempts = 0;
         const MAX_ATTEMPTS = 20;
 
         while (status !== 'CONNECTED' && attempts < MAX_ATTEMPTS) {
-            const res = await fetch(`/connection/${connectionId}`);
+            const res = await fetch(`/connection/${activeConnectionId}`);
             const data = await res.json();
 
             if (!res.ok) {
@@ -45,6 +48,11 @@ async function connect(){
             await new Promise(r => setTimeout(r, 1000)); // 1s delay
             attempts++;
         }
+
+        if (status !== 'CONNECTED') {
+            throw new Error('Connection timeout');
+          }
+          
 
        setConnectedUI();
     }
@@ -104,3 +112,72 @@ function setConnectingUI() {
     }, 3000);
   }
   
+
+  function setDisconnectingUI() {
+    const bar = document.getElementById('connectionBar');
+    bar.classList.remove('is-connected', 'is-connecting');
+    bar.classList.add('is-disconnecting');
+  
+    document.getElementById('connectionStatus').innerHTML =
+      `<span class="spinner"></span> Disconnecting...`;
+  
+    document.getElementById('disconnectBtn').disabled = true;
+    document.getElementById('sendBtn').disabled = true;
+  }
+
+  
+  async function disconnect(){
+    setDisconnectingUI();
+    try{
+
+        const res = await fetch(`/connection/${activeConnectionId}`, {
+            method : 'DELETE',
+            headers : {'Content-Type' : 'application/json'},
+        
+        })
+
+        const data = await res.json();
+
+        if(!res.ok){
+            throw new Error(data.message);
+            
+        }
+
+        let Status = null;
+        let Attempts = 0;
+        const MAX_ATTEMPTS = 20;
+
+        while (Status !== 'DISCONNECTED' && Attempts < MAX_ATTEMPTS) {
+            const res = await fetch(`/connection/${activeConnectionId}`);
+            const data = await res.json();
+
+            if (!res.ok) {
+            throw new Error(data.message);
+            }
+
+            Status = data.status;
+
+            if (Status === 'FAILED') {
+                throw new Error('Disconnect failed');
+            }
+
+            await new Promise(r => setTimeout(r, 1000)); // 1s delay
+            Attempts++;
+        }
+
+        if (Status !== 'DISCONNECTED') {
+            throw new Error('Disconnect timeout');
+          }
+          
+
+        setDisconnectedUI();
+        activeConnectionId = null;
+    }
+    catch(error){
+        setConnectedUI(); 
+        showToast(error.message);
+    }
+    
+
+
+  }
