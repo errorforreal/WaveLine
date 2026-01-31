@@ -1,9 +1,6 @@
 const connectionReq = require('../models/connection');
 const { generateConnectionId } = require('../src/services/connectionID');
 const { connectToWs, disconnectWs} = require('../modules/connection/ws-client');
-const {removeSocket, getSocket} = require('../src/services/connectionID');
-
-
 
 async function handleConnection(req,res){
 

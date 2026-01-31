@@ -1,9 +1,11 @@
 const express = require('express');
 const connectionReq = require('../../models/connection');
-const router = express.Router();
-
+const sendMessage = require('../../controller/message');
 const { handleConnection, handleDisconnect } = require('../../controller/connection');
 const isLoggedIn = require('../../middleware/auth');
+
+const router = express.Router();
+
 
 router.post('/',isLoggedIn , handleConnection );
 router.delete('/:id',handleDisconnect);
@@ -25,5 +27,9 @@ router.get('/:id', async (req,res)=>{
         })
     }
 })
+
+router.post('/:id/message', sendMessage);
+
+
 
 module.exports = router;

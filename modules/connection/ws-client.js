@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 const {addSocket, removeSocket, getSocket} = require('../../src/services/connectionID');
 const connection = require('../../models/connection');
+const Message = require('../../models/message');
 
 
 async function connectToWs(wsUrl, connectionId){
@@ -30,7 +31,20 @@ async function connectToWs(wsUrl, connectionId){
                 status : 'DISCONNECTED'
             })
 
+            console.log('disconnected');
+            
+
             removeSocket(connectionId);
+        })
+
+        const id = await connection.findOne({connectionId})
+        ws.on('message',async(message)=>{
+            await Message.create({
+                connectionId : id._id,
+                status : 'RECIEVED',
+                payload : message
+
+            })
         })
     }
     catch(error){
