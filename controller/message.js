@@ -9,7 +9,7 @@ async function sendMessage(req,res){
         
         await SendMessage(connectionId, payload);
         res.status(200).json({
-            status :  'SENT'
+            status :  'SENT'  
         })
     }
     catch(error){

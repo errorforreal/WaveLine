@@ -1,3 +1,23 @@
+let activeConnectionId = null;
+let connectionState = 'IDLE';
+const pendingLogs = [];
+
+const uiWs = new WebSocket('ws://localhost:8000/ui-ws');
+
+uiWs.onmessage = (event)=>{
+    const message = JSON.parse(event.data);
+
+    if(connectionState != 'CONNECTED'){
+        pendingLogs.push(message);
+        return;
+    }
+
+    addLog({
+        message,
+        direction: 'INCOMING',
+        status: 'RECIEVED'
+    });
+}
 
 
 
@@ -10,6 +30,8 @@ function setConnectingUI() {
       `<span class="spinner"></span> Connecting...`;
   
     document.getElementById('connectBtn').disabled = true;
+    document.getElementById('logList').innerHTML = '';
+    connectionState = 'CONNECTING';
     
   }
 
@@ -25,7 +47,9 @@ function setConnectingUI() {
     document.getElementById('sendBtn').disabled = false
 
     document.getElementById('messageInput').value = '';
-    document.getElementById('logList').innerHTML = '';
+    
+    connectionState = 'CONNECTED';
+   
   }
   
   function setDisconnectedUI() {
@@ -38,6 +62,8 @@ function setConnectingUI() {
     document.getElementById('connectBtn').disabled = false;
     document.getElementById('disconnectBtn').disabled = true;
     document.getElementById('sendBtn').disabled = true;
+
+    connectionState = 'IDLE';
   }
   
   function showToast(message) {
@@ -65,7 +91,7 @@ function setConnectingUI() {
     document.getElementById('sendBtn').disabled = true;
   }
 
-  function addLog({ message, direction, status = 'SENT', timestamp = Date.now() }) {
+  function addLog({ message, direction, status , timestamp = Date.now() }) {
     const logList = document.getElementById('logList');
   
     const row = document.createElement('div');
@@ -101,7 +127,6 @@ function setConnectingUI() {
   }
   
 
-let activeConnectionId = null;
 
 
 async function connect(){
@@ -130,6 +155,11 @@ async function connect(){
         }
 
         activeConnectionId = data.connectionId;
+        uiWs.send(JSON.stringify({
+            type : 'BIND_CONNECTION',
+            ConnectionId : activeConnectionId
+           }))
+
         let status = null;
         let attempts = 0;
         const MAX_ATTEMPTS = 20;
@@ -158,10 +188,23 @@ async function connect(){
           
 
        setConnectedUI();
+
+       pendingLogs.forEach(msg => {
+            addLog({
+                message : msg,
+                direction : 'INCOMING',
+                status : 'RECIEVED'
+            })
+       });
+
+       
+
     }
     catch(error){
         setDisconnectedUI();
         showToast(error.message);
+        console.log(error);
+        
     }
 
 }
@@ -216,6 +259,9 @@ async function disconnect(){
           
 
           setDisconnectedUI();
+          uiWs.send(JSON.stringify({
+            type : 'REMOVE_CONNECTION'
+          }))
           activeConnectionId = null;
         }
         catch(error){

@@ -11,7 +11,7 @@ const connectToMongo = require('./connection');
 const userRoute = require('./router/user');
 const connectionRoute = require('./router/connection');
 
-
+const { initUiWebSocket } = require('../modules/message/ui-ws');
 
 const app = express();
 connectToMongo('mongodb://localhost:27017/Waveline').then(()=>{
@@ -30,7 +30,9 @@ app.use('/connection',connectionRoute );
 
 
 
-app.listen(8000, ()=>{
+const server= app.listen(8000, ()=>{
     console.log('Server is listening...');
     
 })
+
+initUiWebSocket(server);
