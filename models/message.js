@@ -9,14 +9,14 @@ const messageSchema = new mongoose.Schema({
     
     status : {
         type : String,
-        enum : ['SENT' , 'RECIEVED', 'FAILED'],
+        enum : ['SENT' , 'RECEIVED', 'FAILED'],
         required : true
     },
 
     format : {
         type : String,
-        enum : ["RAW", 'JSON'],
-        default : 'RAW'
+        enum : ["TEXT", 'JSON'],
+        default : 'TEXT'
     },
 
     payload : {

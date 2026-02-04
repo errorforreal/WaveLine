@@ -2,12 +2,13 @@ const SendMessage = require('../modules/message/ws-message');
 const ConnectionReq = require('../models/connection');
 
 async function sendMessage(req,res){
-    const {payload} = req.body;
+    const {payload, format} = req.body;
     const connectionId = req.params.id;
 
     try{
         
-        await SendMessage(connectionId, payload);
+        
+        await SendMessage(connectionId, payload, format);
         res.status(200).json({
             status :  'SENT'  
         })

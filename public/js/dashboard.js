@@ -1,8 +1,16 @@
 let activeConnectionId = null;
 let connectionState = 'IDLE';
 const pendingLogs = [];
+let sessionId = crypto.randomUUID();
 
 const uiWs = new WebSocket('ws://localhost:8000/ui-ws');
+
+uiWs.onopen = ()=>{
+  uiWs.send(JSON.stringify({
+    type : 'BIND_CONNECTION',
+    SessionId : sessionId
+  }));
+};
 
 uiWs.onmessage = (event)=>{
     const message = JSON.parse(event.data);
@@ -13,9 +21,9 @@ uiWs.onmessage = (event)=>{
     }
 
     addLog({
-        message,
+        message : message.message,
         direction: 'INCOMING',
-        status: 'RECIEVED'
+        status: 'RECEIVED',
     });
 }
 
@@ -143,7 +151,7 @@ async function connect(){
         
         const res = await fetch('/connection', {
             method : 'POST',
-            headers : {'Content-Type' : 'application/json', 'authorization' : `Bearer ${authToken}`},
+            headers : {'Content-Type' : 'application/json', 'authorization' : `Bearer ${authToken}`, 'session-id' : `${sessionId}`},
             body : JSON.stringify(payload)
         })
     
@@ -155,10 +163,7 @@ async function connect(){
         }
 
         activeConnectionId = data.connectionId;
-        uiWs.send(JSON.stringify({
-            type : 'BIND_CONNECTION',
-            ConnectionId : activeConnectionId
-           }))
+       
 
         let status = null;
         let attempts = 0;
@@ -189,15 +194,13 @@ async function connect(){
 
        setConnectedUI();
 
-       pendingLogs.forEach(msg => {
-            addLog({
-                message : msg,
-                direction : 'INCOMING',
-                status : 'RECIEVED'
-            })
+       pendingLogs.forEach( message => {
+        addLog({
+            message : message.message,
+            direction: 'INCOMING',
+            status: 'RECEIVED'
+        })
        });
-
-       
 
     }
     catch(error){
@@ -273,6 +276,7 @@ async function disconnect(){
     
     async function sendMessage(){
         const message = document.getElementById('messageInput').value.trim();
+        const format = document.getElementById('messageFormat').value;
         if(!message){
             showToast('No message to send');
             return;
@@ -285,7 +289,7 @@ async function disconnect(){
             headers : {'Content-Type' : 'application/json'},
             body : JSON.stringify({
                 payload : message,
-                format : 'TEXT'
+                format : format.toUpperCase()
             })
         })
         
@@ -300,8 +304,12 @@ async function disconnect(){
         addLog({
             message,
             direction: 'OUTGOING',
-            status: 'SENT'
+            status: 'SENT',
+            format
           });
+
+          document.getElementById('messageInput').value = '';
+
           
     }
     catch(error){

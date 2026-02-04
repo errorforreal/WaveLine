@@ -1,14 +1,18 @@
 const connectionReq = require('../models/connection');
 const { generateConnectionId } = require('../src/services/connectionID');
 const { connectToWs, disconnectWs} = require('../modules/connection/ws-client');
+const { sessionMap } = require('../modules/message/ui-ws');
 
 async function handleConnection(req,res){
 
-    const { wsUrl } = req.body
-
+    const { wsUrl } = req.body;
+    const sessionId = req.headers['session-id'];
+ 
     try{
        
         const id = generateConnectionId();
+        sessionMap.set(id, sessionId);
+
         const ConnectionReq = await connectionReq.create({
             connectionId : id,
             createdBy : req.user._id,
