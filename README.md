@@ -1,72 +1,145 @@
+WaveLine is a backend system that lets clients create, manage, and observe WebSocket connections without directly connecting to the target servers.
+It acts as a control plane between the browser and external WebSocket services.
 
-- The browser never talks directly to the target server
-- The backend manages all WebSocket connections
-- The UI receives live updates via a dedicated WebSocket channel
+Instead of:
 
-This design avoids polling, keeps state consistent, and scales cleanly.
+Browser ─────▶ Target WS
 
----
 
-## Tech Stack
+WaveLine enables:
 
-- Frontend: HTML, CSS, Vanilla JavaScript
-- Backend: Node.js, Express
-- WebSockets: `ws`
-- Database: MongoDB (Mongoose)
-- Authentication: Token-based (JWT-ready)
+Browser ─▶ WaveLine Backend ─▶ Target WebSocket
 
----
 
-## Connection Flow
+This allows full visibility, tracking, retries, history, and lifecycle management.
 
-1. UI loads and opens a WebSocket to the backend (`/ui-ws`)
-2. User clicks **Connect**
-3. Backend opens a WebSocket to the target server
-4. UI binds itself to the new connection
-5. Messages flow in real time (no polling)
-6. Disconnect cleanly tears down the connection
 
----
+## Core Idea
 
-## Message Handling
+WaveLine splits real-time communication into two layers:
 
-- Outgoing messages are sent via HTTP
-- Incoming messages are pushed to the UI via WebSocket
-- Messages are persisted with:
-  - direction (INCOMING / OUTGOING)
-  - status (SENT / RECEIVED / FAILED)
-  - timestamp
+Control Plane	Browser ↔ WaveLine (user commands, UI updates)
 
----
+Data Plane	WaveLine ↔ Target WebSocket (actual external connection)
 
-## Why WaveLine
+The browser never talks directly to external WebSocket servers.
 
-Most WebSocket tools:
-- mix UI logic with connection logic
-- rely on polling
-- lose messages during connect/disconnect
-- are hard to reason about internally
 
-WaveLine is built with:
-- explicit connection state
-- clear separation of concerns
-- predictable lifecycle handling
-- backend-controlled WebSocket routing
 
-This makes it ideal for learning, debugging, and extending.
+##  MongoDB as the Control Plane State
 
----
+Every WebSocket connection request is stored as a Connection Document.
 
-## Current Status
+It represents:
 
-WaveLine is an MVP under active development.
+“User X asked to connect to Y — this is what happened.”
 
-Planned improvements:
-- JSON viewer with expand/collapse
-- Saved connections
-- Multiple concurrent connections
-- Protocol plugins (SSE, Socket.IO, MQTT)
-- Authentication on UI WebSocket
-- Reconnect & retry strategies
+Example:
 
----
+{
+  "userId": "123",
+  "targetUrl": "wss://stream.binance.com/ws",
+  "status": "connecting",
+  "createdAt": "2026-01-29",
+}
+
+
+This allows:
+
+Live status updates
+
+History tracking
+
+Debugging
+
+Retry logic
+
+UI synchronization
+
+
+
+
+## Connection Lifecycle
+
+Each request flows through states:
+
+REQUESTED → CONNECTING → CONNECTED → DISCONNECTED → (RETRY or FAILED)
+
+
+
+
+## The backend:
+
+Receives a connection request
+
+Stores it in MongoDB
+
+Attempts the WebSocket connection
+
+Updates the document based on what happens
+
+Pushes live updates to the UI via WS
+
+
+
+
+## Engineering Decisions
+1.  Backend as a WebSocket Broker
+
+The backend manages two independent WebSocket channels:
+
+UI ↔ Backend
+
+Backend ↔ Target WS
+
+This allows:
+
+Multiple UI clients
+
+One backend connection
+
+Controlled fan-out
+
+This is how:
+
+Crypto dashboards
+
+Trading terminals
+
+Multiplayer servers
+are built.
+
+2.  MongoDB as a State Machine
+
+Mongo is not just a database here — it acts as a distributed state machine for:
+
+Connection status
+
+Failures
+
+Retries
+
+History
+
+This mirrors how real systems use:
+
+Redis
+
+DynamoDB
+
+Postgres
+as coordination layers.
+
+3.  Separation of Concerns
+
+The backend is split into:
+
+controllers → request handling
+
+models → Mongo schemas
+
+modules/connection → WebSocket lifecycle logic
+
+middleware → auth & guards
+
+This prevents real-time logic from being mixed with HTTP logic.
