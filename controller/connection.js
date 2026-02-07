@@ -13,11 +13,18 @@ async function handleConnection(req,res){
         const id = generateConnectionId();
         sessionMap.set(id, sessionId);
 
+        const ConnectionEvent = {
+            type : 'REQUESTED',
+            metadata : {}
+        }
+
         const ConnectionReq = await connectionReq.create({
             connectionId : id,
             createdBy : req.user._id,
-            wsUrl : wsUrl
+            wsUrl : wsUrl,
+            events : [ConnectionEvent]
         })
+
 
          res.status(200).json({
             connectionId : id,

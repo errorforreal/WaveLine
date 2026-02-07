@@ -6,14 +6,23 @@ const {notifyUi} = require('../message/ui-ws');
 const {sessionMap} = require('../message/ui-ws');
 const checkJSON = require('../../src/services/checkJSON');
 
-
 async function connectToWs(wsUrl, connectionId){
+    let phase = 'handshake';
 
     try{
 
+        const connectionEvent = {
+            type : 'CONNECTING',
+            metadata : {}
+        }
+        await connection.updateOne({connectionId}, {
+            $set : {status : 'CONNECTING'},
+            $push : {events : connectionEvent}
+        })
+
         const ws = new WebSocket(wsUrl);
         
-        const id = await connection.findOne({connectionId});
+
         
         ws.on('message',async(raw)=>{
             const message = raw.toString();
@@ -25,6 +34,7 @@ async function connectToWs(wsUrl, connectionId){
                 format = 'JSON';
             }
 
+            const id = await connection.findOne({connectionId});
             notifyUi(connectionId, message, format);
             await Message.create({
                 connectionId : id._id,
@@ -36,28 +46,50 @@ async function connectToWs(wsUrl, connectionId){
         })
 
         ws.on('open', async ()=>{
+            phase = 'active';
+            
           addSocket(connectionId, ws);
+
+          const connectionEvent = {
+            type : 'CONNECTED',
+            metadata : {}
+          }
   
           await connection.updateOne({connectionId}, {
-              status : 'CONNECTED'
+              $set : {status : 'CONNECTED'},
+              $push : {events : connectionEvent}
           })
 
 
         });
 
   
-        ws.on('error', async ()=>{
-          await connection.updateOne({connectionId}, {
-            status : 'FAILED'
-          })
+        ws.on('error', async (err)=>{
+
+            let connectionEvent = {
+                type : 'FAILED',
+                metadata : {reason : 'connection_failed', phase : phase, code : err.code || 'UNKNOWN' , message : err.message}
+            }
+
+            await connection.updateOne({connectionId}, {
+              $set : {status : 'FAILED'},
+              $push : {events : connectionEvent}
+            })
+
 
           sessionMap.delete(connectionId);
           removeSocket(connectionId);
         });
 
         ws.on('close', async ()=>{
+
+            const ConnectionEvent = {
+                type : 'DISCONNECTED',
+                metadata : { reason : 'target closed'}
+            }
             await connection.updateOne({connectionId}, {
-                status : 'DISCONNECTED'
+                $set : {status : 'DISCONNECTED'},
+                $push : {events : ConnectionEvent}
             })
 
             sessionMap.delete(connectionId);
@@ -82,8 +114,14 @@ async function disconnectWs(connectionId){
     try{
         ws.close();
 
+        const connectionEvent = {
+            type : 'DISCONNECTED',
+            metadata : {reason : 'client disconnected'}
+        }
+
         await connection.updateOne({connectionId},{
-            status : 'DISCONNECTED'
+            $set : {status : 'DISCONNECTED'},
+            $push : {events : connectionEvent}
         })
         removeSocket(connectionId);
     }
