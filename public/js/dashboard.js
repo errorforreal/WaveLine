@@ -317,3 +317,9 @@ async function disconnect(){
     }
     
   }
+
+
+
+  document.querySelector('.sidebar-btn').addEventListener('click', () => {
+    window.location.href = '/workspace.html';
+  });

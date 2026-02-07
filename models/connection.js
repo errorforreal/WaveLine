@@ -8,7 +8,7 @@ const connectionEventSchema = new mongoose.Schema({
     },
 
     metadata : {
-        type : mongoose.Schema.Types.mixed,
+        type : mongoose.Schema.Types.Mixed,
         default : {}
     },
      

@@ -1,0 +1,48 @@
+<!-- workspace.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WaveLine – Workspace</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./css/dashboard.css" />
+  <link rel="stylesheet" href="./css/workspace.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="sidebar-nav">
+      <button class="sidebar-btn active" data-view="collections">📁</button>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-panel">
+
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="connection-left">
+        <h2 class="workspace-title">Connections</h2>
+      </div>
+    </header>
+
+    <!-- Workspace Content -->
+    <section class="workspace-content">
+
+      <div id="connections-list" class="connections-list">
+        <!-- injected by JS -->
+      </div>
+
+    </section>
+
+    <div id="toast" class="toast hidden"></div>
+
+  </main>
+</div>
+
+<script src="./js/workspace.js"></script>
+</body>
+</html>

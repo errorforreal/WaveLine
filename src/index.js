@@ -10,6 +10,7 @@ const connectToMongo = require('./connection');
 
 const userRoute = require('./router/user');
 const connectionRoute = require('./router/connection');
+const showWorkspace = require('./router/showWorkspace');
 
 const { initUiWebSocket } = require('../modules/message/ui-ws');
 
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname , '../public')));
 app.use(express.urlencoded({extended : false}));
 app.use('/user', userRoute);
 app.use('/connection',connectionRoute );
+app.use('/workspace', showWorkspace);
 
 
 
