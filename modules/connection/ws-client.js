@@ -21,6 +21,8 @@ async function connectToWs(wsUrl, connectionId){
         })
 
         const ws = new WebSocket(wsUrl);
+
+        ws._closeInitiator = 'target';
         
 
         
@@ -83,10 +85,17 @@ async function connectToWs(wsUrl, connectionId){
 
         ws.on('close', async ()=>{
 
-            const ConnectionEvent = {
+            let ConnectionEvent = {
                 type : 'DISCONNECTED',
-                metadata : { reason : 'target closed'}
+                metadata : { reason : 'client closed'}
             }
+
+            if(ws._closeInitiator === 'target'){
+
+                ConnectionEvent.metadata = { reason : 'target closed'};
+            }
+           
+
             await connection.updateOne({connectionId}, {
                 $set : {status : 'DISCONNECTED'},
                 $push : {events : ConnectionEvent}
@@ -110,25 +119,11 @@ async function connectToWs(wsUrl, connectionId){
 
 async function disconnectWs(connectionId){
     const ws = getSocket(connectionId);
-
-    try{
-        ws.close();
-
-        const connectionEvent = {
-            type : 'DISCONNECTED',
-            metadata : {reason : 'client disconnected'}
-        }
-
-        await connection.updateOne({connectionId},{
-            $set : {status : 'DISCONNECTED'},
-            $push : {events : connectionEvent}
-        })
-        removeSocket(connectionId);
-    }
-    catch(error){
-        console.log(error);
-        
-    }
+    
+    if(!ws) return;
+    
+    ws._closeInitiator = 'client';
+    ws.close();
 }
 
 module.exports = {

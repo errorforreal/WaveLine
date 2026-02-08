@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+const {getSocket, removeSocket} = require('../../src/services/connectionID');
 
 const uiClients = new Map();
 const sessionMap = new Map();
@@ -24,6 +25,17 @@ function initUiWebSocket(server){
         })
 
         ws.on('close', ()=>{
+
+            for(const [id,sessionId] of sessionMap){
+                if(sessionId == ws.sessionId){
+                    const ws = getSocket(id);
+                    ws._closeInitiator = 'client';
+                    ws.close();
+                    removeSocket(id);
+                    break;
+                }
+            }
+
             uiClients.delete(ws.sessionId);
         })
     })
