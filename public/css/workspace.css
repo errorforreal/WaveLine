@@ -117,3 +117,64 @@
     padding: 40px 0;
   }
   
+
+  .connection-row {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .connection-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .connection-details {
+    margin-top: 10px;
+    padding: 10px;
+    background: #1a1a1a;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+  
+  .hidden {
+    display: none;
+  }
+
+  .message-row {
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    background: #1e1e1e;
+  }
+  
+  .message-row.incoming {
+    border-left: 3px solid #4ade80; /* green */
+  }
+  
+  .message-row.outgoing {
+    border-left: 3px solid #60a5fa; /* blue */
+  }
+  
+  .message-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #9ca3af;
+    margin-bottom: 4px;
+  }
+  
+  .message-payload {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  
+  .empty-messages {
+    font-size: 12px;
+    color: #9ca3af;
+    padding: 10px;
+    text-align: center;
+  }

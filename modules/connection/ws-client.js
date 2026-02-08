@@ -2,8 +2,8 @@ const WebSocket = require('ws');
 const {addSocket, removeSocket, getSocket} = require('../../src/services/connectionID');
 const connection = require('../../models/connection');
 const Message = require('../../models/message');
-const {notifyUi} = require('../message/ui-ws');
-const {sessionMap} = require('../message/ui-ws');
+const {notifyUi} = require('./ui-ws');
+const {sessionMap} = require('./ui-ws');
 const checkJSON = require('../../src/services/checkJSON');
 
 async function connectToWs(wsUrl, connectionId){
@@ -101,6 +101,8 @@ async function connectToWs(wsUrl, connectionId){
                 $push : {events : ConnectionEvent}
             })
 
+            
+            
             sessionMap.delete(connectionId);
             console.log('disconnected');
             
@@ -121,7 +123,7 @@ async function disconnectWs(connectionId){
     const ws = getSocket(connectionId);
     
     if(!ws) return;
-    
+
     ws._closeInitiator = 'client';
     ws.close();
 }

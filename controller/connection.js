@@ -1,7 +1,7 @@
 const connectionReq = require('../models/connection');
 const { generateConnectionId } = require('../src/services/connectionID');
 const { connectToWs, disconnectWs} = require('../modules/connection/ws-client');
-const { sessionMap } = require('../modules/message/ui-ws');
+const { sessionMap } = require('../modules/connection/ui-ws');
 
 async function handleConnection(req,res){
 

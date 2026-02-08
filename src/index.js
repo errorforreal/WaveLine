@@ -12,7 +12,7 @@ const userRoute = require('./router/user');
 const connectionRoute = require('./router/connection');
 const showWorkspace = require('./router/showWorkspace');
 
-const { initUiWebSocket } = require('../modules/message/ui-ws');
+const { initUiWebSocket } = require('../modules/connection/ui-ws');
 
 const app = express();
 connectToMongo('mongodb://localhost:27017/Waveline').then(()=>{
