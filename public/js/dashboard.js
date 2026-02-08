@@ -15,6 +15,8 @@ uiWs.onopen = ()=>{
 uiWs.onmessage = (event)=>{
     const message = JSON.parse(event.data);
 
+    if(message.message === 'DISCONNECTED') setDisconnectedUI();
+
     if(connectionState != 'CONNECTED'){
         pendingLogs.push(message);
         return;

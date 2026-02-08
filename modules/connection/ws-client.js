@@ -101,8 +101,11 @@ async function connectToWs(wsUrl, connectionId){
                 $push : {events : ConnectionEvent}
             })
 
-            
-            
+            const value = 'DISCONNECTED'
+            const format = 'TEXT'
+
+            notifyUi(connectionId, value, format);
+
             sessionMap.delete(connectionId);
             console.log('disconnected');
             
