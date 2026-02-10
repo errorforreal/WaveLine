@@ -32,7 +32,8 @@ function initUiWebSocket(wss){
                     const backendws = getSocket(id);
                     backendws._closeInitiator = 'client';
                     backendws.close();
-                    break;
+                    sessionMap.delete(id);
+                   
                 }
             }
 

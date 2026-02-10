@@ -223,6 +223,8 @@ async function connect(){
         })
        });
 
+       pendingLogs.length = 0;
+
     }
     catch(error){
         setDisconnectedUI();
@@ -288,6 +290,8 @@ async function disconnect(){
             id : activeConnectionId
           }))
           activeConnectionId = null;
+          
+          pendingLogs.length = 0;
         }
         catch(error){
             setConnectedUI(); 

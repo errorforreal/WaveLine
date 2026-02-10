@@ -27,6 +27,8 @@ async function connectToWs(wsUrl, connectionId){
 
         
         ws.on('message',async(raw)=>{
+            if(!sessionMap.has(connectionId)) return;
+
             const message = raw.toString();
             let format = 'TEXT';
             const {ok} = checkJSON(message);
@@ -103,9 +105,7 @@ async function connectToWs(wsUrl, connectionId){
 
             
             sessionMap.delete(connectionId);
-            console.log('disconnected');
             
-
             removeSocket(connectionId);
         })
 
@@ -122,6 +122,9 @@ async function disconnectWs(connectionId){
     const ws = getSocket(connectionId);
     
     if(!ws) return;
+
+    sessionMap.delete(connectionId);
+
 
     ws._closeInitiator = 'client';
     ws.close();
