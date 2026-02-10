@@ -6,6 +6,8 @@ require('dotenv').config({
 
 
 const express = require('express');
+const WebSocket = require('ws');
+
 const connectToMongo = require('./connection');
 
 const userRoute = require('./router/user');
