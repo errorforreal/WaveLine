@@ -15,7 +15,7 @@ const showWorkspace = require('./router/showWorkspace');
 const { initUiWebSocket } = require('../modules/connection/ui-ws');
 
 const app = express();
-connectToMongo(process.env.MONOGO_URL).then(()=>{
+connectToMongo(process.env.MONGO_URL).then(()=>{
     console.log('MongoDB connected....');
     
 });
