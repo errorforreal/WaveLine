@@ -16,7 +16,8 @@ let connectionState = 'IDLE';
 const pendingLogs = [];
 let sessionId = crypto.randomUUID();
 
-const uiWs = new WebSocket('ws://localhost:8000/ui-ws');
+const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+const uiWs = new WebSocket(`${protocol}://${window.location.host}/ui-ws`);
 
 uiWs.onopen = ()=>{
   uiWs.send(JSON.stringify({
