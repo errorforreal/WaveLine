@@ -15,7 +15,7 @@ const showWorkspace = require('./router/showWorkspace');
 const { initUiWebSocket } = require('../modules/connection/ui-ws');
 
 const app = express();
-connectToMongo('mongodb://localhost:27017/Waveline').then(()=>{
+connectToMongo(process.env.MONOGO_URL).then(()=>{
     console.log('MongoDB connected....');
     
 });
@@ -31,8 +31,8 @@ app.use('/workspace', showWorkspace);
 
 
 
-
-const server= app.listen(8000, ()=>{
+const PORT = process.env.PORT || 8000;
+const server= app.listen(PORT, ()=>{
     console.log('Server is listening...');
     
 })
