@@ -37,4 +37,17 @@ const server= app.listen(PORT, ()=>{
     
 })
 
-initUiWebSocket(server);
+const wss = new WebSocket.Server({ noServer: true });
+
+server.on('upgrade', (req, socket, head) => {
+  if (req.url === '/ui-ws') {
+    wss.handleUpgrade(req, socket, head, ws => {
+      wss.emit('connection', ws, req);
+    });
+  } else {
+    socket.destroy();
+  }
+});
+
+initUiWebSocket(wss);
+

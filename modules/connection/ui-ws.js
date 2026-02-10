@@ -4,8 +4,7 @@ const {getSocket, removeSocket} = require('../../src/services/connectionID');
 const uiClients = new Map();
 const sessionMap = new Map();
 
-function initUiWebSocket(server){
-    const wss = new WebSocket.Server({server, path : '/ui-ws'});
+function initUiWebSocket(){
 
     wss.on('connection', (ws)=>{
 
@@ -43,13 +42,13 @@ function initUiWebSocket(server){
 
 function notifyUi(connectionId, value, format){
     const sessionId = sessionMap.get(connectionId);
-    const ws = uiClients.get(sessionId);
+    const uiws = uiClients.get(sessionId);
     const payload = {
         message : value,
         format : format
     }
-    if(ws && ws.readyState === ws.OPEN){
-        ws.send(JSON.stringify(payload));
+    if(uiws && uiws.readyState === uiws.OPEN){
+        uiws.send(JSON.stringify(payload));
     }
 }
 
