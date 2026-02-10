@@ -72,7 +72,6 @@ function setConnectingUI() {
 
     document.getElementById('messageInput').value = '';
 
-    document.getElementById('log-list').innerHTML = '';
     
     connectionState = 'CONNECTED';
    
