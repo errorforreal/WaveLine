@@ -71,6 +71,8 @@ function setConnectingUI() {
     document.getElementById('sendBtn').disabled = false
 
     document.getElementById('messageInput').value = '';
+
+    document.getElementById('log-list').innerHTML = '';
     
     connectionState = 'CONNECTED';
    

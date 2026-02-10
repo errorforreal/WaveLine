@@ -26,9 +26,9 @@ function initUiWebSocket(wss){
 
             for(const [id,sessionId] of sessionMap){
                 if(sessionId == ws.sessionId){
-                    const ws = getSocket(id);
-                    ws._closeInitiator = 'client';
-                    ws.close();
+                    const backendws = getSocket(id);
+                    backendws._closeInitiator = 'client';
+                   
                     removeSocket(id);
                     break;
                 }
