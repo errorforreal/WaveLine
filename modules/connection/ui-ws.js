@@ -15,6 +15,9 @@ function initUiWebSocket(wss){
                     uiClients.set(data.SessionId, ws);
                     ws.sessionId = data.SessionId;
                 }
+                if(data.type === 'REMOVE_CONNECTION'){
+                    sessionMap.delete(data.id);
+                }
             }
             catch(e){
                 console.error('Invalid ui ws message');
@@ -28,8 +31,7 @@ function initUiWebSocket(wss){
                 if(sessionId == ws.sessionId){
                     const backendws = getSocket(id);
                     backendws._closeInitiator = 'client';
-                   
-                    removeSocket(id);
+                    backendws.close();
                     break;
                 }
             }

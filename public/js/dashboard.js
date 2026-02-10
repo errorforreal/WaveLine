@@ -284,7 +284,8 @@ async function disconnect(){
 
           setDisconnectedUI();
           uiWs.send(JSON.stringify({
-            type : 'REMOVE_CONNECTION'
+            type : 'REMOVE_CONNECTION',
+            id : activeConnectionId
           }))
           activeConnectionId = null;
         }
