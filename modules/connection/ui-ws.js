@@ -1,10 +1,9 @@
-const WebSocket = require('ws');
 const {getSocket, removeSocket} = require('../../src/services/connectionID');
 
 const uiClients = new Map();
 const sessionMap = new Map();
 
-function initUiWebSocket(){
+function initUiWebSocket(wss){
 
     wss.on('connection', (ws)=>{
 
