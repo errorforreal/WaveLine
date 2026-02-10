@@ -6,6 +6,7 @@ function isLoggedIn(req, res, next){
         return res.status(401).json({
             message : 'You are logged out'
         })
+     
     }
 
     const authToken = authheaders.split('Bearer ')[1];
@@ -17,6 +18,7 @@ function isLoggedIn(req, res, next){
             return res.status(401).json({
                 message : 'You are logged out'
             })
+
         }
         req.user = user;
         next();
@@ -24,6 +26,7 @@ function isLoggedIn(req, res, next){
 
     catch(error){
         return res.status(401).json({ message: 'You are logged out' });
+
     }
 
 

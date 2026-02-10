@@ -1,3 +1,16 @@
+(function checkAuth() {
+  const token = localStorage.getItem('authToken');
+
+  const loginBtn = document.getElementById('loginBtn');
+  const connectBtn = document.getElementById('connectBtn');
+
+  if (!token) {
+    loginBtn.classList.remove('hidden');
+    connectBtn.disabled = true;
+  }
+})();
+
+
 let activeConnectionId = null;
 let connectionState = 'IDLE';
 const pendingLogs = [];
@@ -141,15 +154,19 @@ function setConnectingUI() {
 
 async function connect(){
 
-    setConnectingUI();
-    const input = document.getElementById('wsUrlInput').value.trim();
-    const authToken = localStorage.getItem('authToken');
-
-    const payload = {
+  try{
+      const input = document.getElementById('wsUrlInput').value.trim();
+      if(!input){
+        throw new Error('Enter a url');
+        
+      }
+      const authToken = localStorage.getItem('authToken');
+      
+      const payload = {
         wsUrl : input
-    }
-
-    try{
+      }
+      
+      setConnectingUI();
         
         const res = await fetch('/connection', {
             method : 'POST',
@@ -325,3 +342,7 @@ async function disconnect(){
   document.querySelector('.sidebar-btn').addEventListener('click', () => {
     window.open('/workspace.html', '_blank');
   });
+
+  function goToLogin() {
+    window.location.href = '/login.html';
+  }

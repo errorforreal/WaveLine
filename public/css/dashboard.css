@@ -409,3 +409,13 @@
     }
   }
   
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--border);
+  }
+  
+  .btn-secondary:hover {
+    background: var(--panel-alt);
+  }

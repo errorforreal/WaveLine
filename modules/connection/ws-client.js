@@ -12,7 +12,7 @@ async function connectToWs(wsUrl, connectionId){
     try{
 
         const connectionEvent = {
-            type : 'CONNECTING',
+            type : 'CONNECTING', 
             metadata : {}
         }
         await connection.updateOne({connectionId}, {
