@@ -20,7 +20,7 @@ loginForm.addEventListener('submit', async (e)=>{
         const data = await res.json();
 
         if(!res.ok){
-            throw new Error(data.message)
+            throw new Error(data.error);
         }
 
         localStorage.setItem('authToken', data.loginToken);
