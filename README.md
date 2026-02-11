@@ -1,145 +1,100 @@
-WaveLine is a backend system that lets clients create, manage, and observe WebSocket connections without directly connecting to the target servers.
-It acts as a control plane between the browser and external WebSocket services.
+WaveLine is a real-time WebSocket proxy and lifecycle observability tool.
+It allows users to initiate WebSocket connections to external servers, monitor message flow, and track connection state transitions with persistent history.
 
-Instead of:
+## What It Does :
 
-Browser ─────▶ Target WS
+WaveLine allows a user to:
 
+- Connect to any WebSocket endpoint
 
-WaveLine enables:
+- View real-time incoming and outgoing messages
 
-Browser ─▶ WaveLine Backend ─▶ Target WebSocket
+- Track connection lifecycle states (REQUESTED → CONNECTING → CONNECTED → DISCONNECTED / FAILED)
 
+- Persist connection history in MongoDB
 
-This allows full visibility, tracking, retries, history, and lifecycle management.
+- Revisit past connections and inspect message logs
 
-
-## Core Idea
-
-WaveLine splits real-time communication into two layers:
-
-Control Plane	Browser ↔ WaveLine (user commands, UI updates)
-
-Data Plane	WaveLine ↔ Target WebSocket (actual external connection)
-
-The browser never talks directly to external WebSocket servers.
+- It acts as a WebSocket control plane + monitoring layer.
 
 
+## Architecture Overview
 
-##  MongoDB as the Control Plane State
+WaveLine uses a layered architecture separating:
 
-Every WebSocket connection request is stored as a Connection Document.
+### UI WebSocket Channel
 
-It represents:
+- Maintains persistent UI ↔ backend communication
 
-“User X asked to connect to Y — this is what happened.”
+- Streams live events and messages to frontend
 
-Example:
+### Target WebSocket Client
 
-{
-  "userId": "123",
-  "targetUrl": "wss://stream.binance.com/ws",
-  "status": "connecting",
-  "createdAt": "2026-01-29",
-}
+- Connects to user-specified external WebSocket endpoints
 
+- Handles message forwarding and lifecycle events
 
-This allows:
+### Connection Lifecycle Engine
 
-Live status updates
+- Tracks state transitions
 
-History tracking
+- Stores event history in database
 
-Debugging
+- Maintains in-memory socket references
 
-Retry logic
+### Persistence Layer
 
-UI synchronization
+MongoDB (Atlas)
 
+Stores:
 
+- Connections
 
-
-## Connection Lifecycle
-
-Each request flows through states:
-
-REQUESTED → CONNECTING → CONNECTED → DISCONNECTED → (RETRY or FAILED)
+- Lifecycle events
 
 
+## Connection Lifecycle Model
 
+Each connection request is stored with structured lifecycle events:
 
-## The backend:
+REQUESTED 
+CONNECTING
+CONNECTED
+DISCONNECTED / FAILED
 
-Receives a connection request
+Each state transition is persisted with:
 
-Stores it in MongoDB
+- Timestamp
 
-Attempts the WebSocket connection
-
-Updates the document based on what happens
-
-Pushes live updates to the UI via WS
-
-
-
-
-## Engineering Decisions
-1.  Backend as a WebSocket Broker
-
-The backend manages two independent WebSocket channels:
-
-UI ↔ Backend
-
-Backend ↔ Target WS
+- Metadata (error reason, close initiator, etc.)
 
 This allows:
 
-Multiple UI clients
+- Historical auditing
 
-One backend connection
+- Post-mortem debugging
 
-Controlled fan-out
+- Replayable connection logs
 
-This is how:
 
-Crypto dashboards
+## Use Cases
 
-Trading terminals
+- Testing third-party WebSocket APIs
 
-Multiplayer servers
-are built.
+- Monitoring real-time message streams
 
-2.  MongoDB as a State Machine
+- Debugging WS-based integrations
 
-Mongo is not just a database here — it acts as a distributed state machine for:
+- Educational exploration of WS lifecycle handling
 
-Connection status
+## Limitations
 
-Failures
+- In-memory session maps (not horizontally scalable)
 
-Retries
+- No distributed state store (e.g., Redis)
 
-History
+- Single-instance deployment model
 
-This mirrors how real systems use:
 
-Redis
 
-DynamoDB
 
-Postgres
-as coordination layers.
-
-3.  Separation of Concerns
-
-The backend is split into:
-
-controllers → request handling
-
-models → Mongo schemas
-
-modules/connection → WebSocket lifecycle logic
-
-middleware → auth & guards
-
-This prevents real-time logic from being mixed with HTTP logic.
