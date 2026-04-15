@@ -16,6 +16,8 @@ async function showWorkspace(){
 
     try{
       const authToken = localStorage.getItem('authToken');
+      console.log(authToken);
+      
 
       const res = await fetch('/workspace/api', {
         method : 'GET',

@@ -2,8 +2,8 @@ const WebSocket = require('ws');
 const {addSocket, removeSocket, getSocket} = require('../../src/services/connectionID');
 const connection = require('../../models/connection');
 const Message = require('../../models/message');
-const {notifyUi} = require('./ui-ws');
-const {sessionMap} = require('./ui-ws');
+const {notifyUi} = require('../connection/ui-ws');
+const {sessionMap} = require('../connection/ui-ws');
 const checkJSON = require('../../src/services/checkJSON');
 
 async function connectToWs(wsUrl, connectionId){
@@ -44,7 +44,8 @@ async function connectToWs(wsUrl, connectionId){
                 connectionId : id._id,
                 status : 'RECEIVED',
                 payload : message,
-                format : format
+                format : format,
+                receivedAt : Date.now()
 
             })
         })

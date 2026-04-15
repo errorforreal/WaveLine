@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
-const {generateToken} = require('../src/services/auth');
+const {generateToken, verifyToken} = require('../src/services/auth');
+const {addOnlineUser, removeOnlineUser} = require('../src/services/onlineUser.service');
 
 async function handleLogin(req,res){
     const {email , password} = req.body;
@@ -18,6 +19,8 @@ async function handleLogin(req,res){
                     error : 'Invalid username or password'
                 });
             }
+
+            await addOnlineUser(user._id);
 
             const loginToken = generateToken(user);
             
@@ -62,7 +65,23 @@ async function handleSignup(req,res){
     }
 }
 
+async function handleLogout(req,res){
+    const authheader = req.headers.authorization;
+    
+    const token = authheader.split('Bearer ')[1];
+    const user = verifyToken(token);
+    
+    if(!user){
+        return res.status(401).json({ message : "Invalid token"} );
+    }
+
+    await removeOnlineUser(user._id);
+
+    return res.status(200).json({ message : "Logged out successfully"})
+}
+
 module.exports = {
     handleLogin,
-    handleSignup
+    handleSignup,
+    handleLogout
 }

@@ -22,6 +22,12 @@ const messageSchema = new mongoose.Schema({
     payload : {
         type : mongoose.Schema.Types.Mixed,
         required : true
+    },
+    sentAt: {
+        type: Date
+    },
+    receivedAt: {
+        type: Date
     }
 }, {timestamps : true});
 

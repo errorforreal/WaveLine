@@ -17,6 +17,11 @@
     <nav class="sidebar-nav">
       <button class="sidebar-btn" data-view="collections" >📁</button>
     </nav>
+
+    <div class="logout-container">
+      <button id="logoutBtn" class="logout-btn hidden" onclick="logOut()">⏻</button>
+    </div>
+
   </aside>
 
   <!-- Main -->
@@ -106,7 +111,12 @@
 </div>
 
 
-
+<div id="logoutOverlay" class="logout-overlay hidden">
+  <div class="logout-box">
+    <div class="spinner large"></div>
+    <p>Logging out...</p>
+  </div>
+</div>
 <script src="./js/dashboard.js"></script>
 </body>
 </html>

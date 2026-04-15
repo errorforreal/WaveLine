@@ -39,7 +39,8 @@ async function sendMessage(id, message, format){
             connectionId : ConnectionReq._id,
             status,
             payload : message,
-            format : format
+            format : format,
+            sentAt : Date.now()
         })
 
         if(status == 'FAILED'){

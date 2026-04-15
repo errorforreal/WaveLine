@@ -3,10 +3,14 @@
 
   const loginBtn = document.getElementById('loginBtn');
   const connectBtn = document.getElementById('connectBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
 
   if (!token) {
     loginBtn.classList.remove('hidden');
     connectBtn.disabled = true;
+
+  }else{
+    logoutBtn.classList.remove('hidden');
   }
 })();
 
@@ -25,6 +29,13 @@ uiWs.onopen = ()=>{
     SessionId : sessionId
   }));
 };
+
+// uiWs.onclose = ()=>{
+//   uiWs.send(JSON.stringify({
+//     type : 'REMOVE_CONNECTION',
+//     SessionId : sessionId
+//   }))
+// }
 
 uiWs.onmessage = (event)=>{
     const message = JSON.parse(event.data);
@@ -275,7 +286,7 @@ async function disconnect(){
                 throw new Error('Disconnect failed');
             }
             
-            await new Promise(r => setTimeout(r, 1000)); // 1s delay
+            await new Promise(r => setTimeout(r, 500)); // 1s delay
             Attempts++;
         }
         
@@ -352,4 +363,50 @@ async function disconnect(){
 
   function goToLogin() {
     window.location.href = '/login.html';
+  }
+
+
+
+  function showLogoutOverlay() {
+    const overlay = document.getElementById("logoutOverlay");
+    overlay.classList.remove("hidden");
+  
+    // disable interactions
+    document.body.style.pointerEvents = "none";
+    overlay.style.pointerEvents = "all";
+  }
+  
+  function hideLogoutOverlay() {
+    const overlay = document.getElementById("logoutOverlay");
+    overlay.classList.add("hidden");
+  
+    document.body.style.pointerEvents = "auto";
+  }
+
+  async function logOut(){
+
+    showLogoutOverlay();
+    try{
+
+      const res = await fetch('/user/logout', {
+        method : 'POST',
+        headers : {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.getItem('authToken')}`}
+      })
+
+      if(!res.ok){
+        throw new Error("Failed to logout");
+      }
+
+      localStorage.removeItem("authToken");
+      uiWs.close();
+
+      setTimeout(() => {
+        window.location.href = '/login.html';
+      }, 800);
+
+    }
+    catch(error){
+      hideLogoutOverlay();
+      showToast(error.message);
+    }
   }
