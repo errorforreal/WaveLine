@@ -72,7 +72,7 @@ async function handleLogout(req,res){
     const user = verifyToken(token);
     
     if(!user){
-        return res.status(401).json({ message : "Invalid token"} );
+        return res.status(401).json({ message : "Invalid token" } );
     }
 
     await removeOnlineUser(user._id);
