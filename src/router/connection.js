@@ -3,6 +3,7 @@ const connectionReq = require('../../models/connection');
 const sendMessage = require('../../controller/message');
 const { handleConnection, handleDisconnect } = require('../../controller/connection');
 const isLoggedIn = require('../../middleware/auth');
+const rateLimiter = require('../../middleware/ratelimiter');
 
 const router = express.Router();
 
@@ -28,7 +29,7 @@ router.get('/:id', async (req,res)=>{
     }
 })
 
-router.post('/:id/message', sendMessage);
+router.post('/:id/message', isLoggedIn , rateLimiter, sendMessage);
 
 
 

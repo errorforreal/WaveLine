@@ -321,9 +321,11 @@ async function disconnect(){
         
         try{
             
+        const authToken = localStorage.getItem('authToken');
+
         const res = await fetch(`/connection/${activeConnectionId}/message`, {
             method : 'POST',
-            headers : {'Content-Type' : 'application/json'},
+            headers : {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${authToken}`},
             body : JSON.stringify({
                 payload : message,
                 format : format.toUpperCase()
