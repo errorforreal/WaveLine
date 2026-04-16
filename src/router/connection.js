@@ -9,7 +9,7 @@ const router = express.Router();
 
 
 router.post('/',isLoggedIn , handleConnection );
-router.delete('/:id',handleDisconnect);
+router.delete('/:id', isLoggedIn, handleDisconnect);
 router.get('/:id', async (req,res)=>{
     const connectionId = req.params.id;
 

@@ -20,7 +20,7 @@ async function handleLogin(req,res){
                 });
             }
 
-            await addOnlineUser(user._id);
+            await addOnlineUser(user._id.toString());
 
             const loginToken = generateToken(user);
             
@@ -75,7 +75,7 @@ async function handleLogout(req,res){
         return res.status(401).json({ message : "Invalid token" } );
     }
 
-    await removeOnlineUser(user._id);
+    await removeOnlineUser(user._id.toString());
 
     return res.status(200).json({ message : "Logged out successfully"})
 }
