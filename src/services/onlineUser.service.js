@@ -13,7 +13,7 @@ const getOnlineUsers = async () => {
 }
 
 const isUserOnline = async (userId) => {
-    return await redis.ismember("online_users", userId);
+    return await redis.sismember("online_users", userId);
 }
 
 module.exports = {

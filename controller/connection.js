@@ -2,10 +2,17 @@ const connectionReq = require('../models/connection');
 const { generateConnectionId } = require('../src/services/connectionID');
 const { connectToWs, disconnectWs} = require('../modules/connection/ws-client');
 const { sessionMap } = require('../modules/connection/ui-ws');
+const validateUrl = require('../src/services/validateUrl');
 
 async function handleConnection(req,res){
 
     const { wsUrl } = req.body;
+
+    const result = validateUrl.safeParse(req.body);
+    if(!result.success){
+        return res.status(500).json({message : "Enter a valid url"});
+    }
+
     const sessionId = req.headers['session-id'];
  
     try{
