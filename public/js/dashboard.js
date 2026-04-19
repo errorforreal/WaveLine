@@ -257,7 +257,7 @@ async function disconnect(){
         
         const res = await fetch(`/connection/${activeConnectionId}`, {
             method : 'DELETE',
-            headers : {'Content-Type' : 'application/json'},
+            headers : {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.getItem('authToken')}`},
             
         })
         
