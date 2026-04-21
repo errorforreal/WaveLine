@@ -127,40 +127,59 @@ function setConnectingUI() {
     document.getElementById('sendBtn').disabled = true;
   }
 
-  function addLog({ message, direction, status , timestamp = Date.now() }) {
-    const logList = document.getElementById('logList');
-  
-    const row = document.createElement('div');
-    row.classList.add('log-row', direction.toLowerCase());
-  
-    if (status === 'FAILED') {
-      row.classList.add('failed');
-    }
-  
-    const icon = document.createElement('div');
-    icon.className = 'log-icon';
-  
-    if (status === 'FAILED') icon.textContent = '✖';
-    else if (direction === 'INCOMING') icon.textContent = '↘';
-    else icon.textContent = '↗';
-  
-    const content = document.createElement('div');
-    content.className = 'log-content';
-  
-    const msg = document.createElement('div');
-    msg.className = 'log-message';
-    msg.textContent = message;
-  
-    const meta = document.createElement('div');
-    meta.className = 'log-meta';
-    meta.textContent = new Date(timestamp).toLocaleTimeString();
-  
-    content.append(msg, meta);
-    row.append(icon, content);
-    logList.appendChild(row);
-  
-    logList.scrollTop = logList.scrollHeight;
+  function addLog({ message, direction, status, timestamp = Date.now() }) {
+  const logList = document.getElementById('logList');
+
+  const row = document.createElement('div');
+  row.classList.add('log-row', direction.toLowerCase());
+
+  const icon = document.createElement('div');
+  icon.className = 'log-icon';
+
+  // 👇 handle states
+  if (status === 'LOADING') {
+    icon.innerHTML = `<span class="spinner"></span>`;
+  } else if (status === 'FAILED') {
+    row.classList.add('failed');
+    icon.textContent = '✖';
+  } else if (direction === 'INCOMING') {
+    icon.textContent = '↘';
+  } else {
+    icon.textContent = '↗';
   }
+
+  const content = document.createElement('div');
+  content.className = 'log-content';
+
+  const msg = document.createElement('div');
+  msg.className = 'log-message';
+  msg.textContent = message;
+
+  const meta = document.createElement('div');
+  meta.className = 'log-meta';
+  meta.textContent = new Date(timestamp).toLocaleTimeString();
+
+  content.append(msg, meta);
+  row.append(icon, content);
+  logList.appendChild(row);
+
+  logList.scrollTop = logList.scrollHeight;
+
+  return row; // ✅ IMPORTANT
+  }
+
+  function updateLogStatus(row, status) {
+  const icon = row.querySelector('.log-icon');
+
+  row.classList.remove('failed');
+
+  if (status === 'FAILED') {
+    row.classList.add('failed');
+    icon.textContent = '✖';
+  } else if (status === 'SENT') {
+    icon.textContent = '↗';
+  }
+}
   
 
 
@@ -319,7 +338,15 @@ async function disconnect(){
             return;
         }
         
-        try{
+      try {
+          
+        const row = addLog({
+            message,
+            direction: 'OUTGOING',
+            status: 'Loading',
+            format
+          });
+          document.getElementById('messageInput').value = '';
             
         const authToken = localStorage.getItem('authToken');
 
@@ -337,21 +364,12 @@ async function disconnect(){
         
         if(!res.ok){
             throw new Error(data.status);
-            
         }
 
-        addLog({
-            message,
-            direction: 'OUTGOING',
-            status: 'SENT',
-            format
-          });
-
-          document.getElementById('messageInput').value = '';
-
-          
+        updateLogStatus(row, 'SENT');
     }
-    catch(error){
+      catch (error) {
+        updateLogStatus(row, 'FAILED');
         showToast(error.message);
     }
     

@@ -18,6 +18,20 @@ async function sendMessage(id, message, format){
         }
 
         let status = 'SENT';
+        if(format == 'JSON'){
+                const {ok} = checkJSON(message);
+                if(!ok){
+                    format = 'TEXT';
+                }
+            }
+        const messageDoc = await Message.create({
+            connectionId : ConnectionReq._id,
+            status,
+            payload : message,
+            format : format,
+            sentAt : Date.now()
+        })
+    
 
         try{
 
@@ -27,23 +41,14 @@ async function sendMessage(id, message, format){
             status = 'FAILED';
         }
 
-        if(format == 'JSON'){
+        
 
-            const {ok} = checkJSON(message);
-            if(!ok){
-                format = 'TEXT';
-            }
-        }
+        if (status == 'FAILED') {
+           await Message.updateOne(
+                { _id: messageDoc._id },  
+                { $set: { status: 'FAILED' } } 
+            );
 
-        await Message.create({
-            connectionId : ConnectionReq._id,
-            status,
-            payload : message,
-            format : format,
-            sentAt : Date.now()
-        })
-
-        if(status == 'FAILED'){
             throw new Error("Websocket send failed");
             
         }

@@ -16,7 +16,7 @@ const validateUrl = z.object({
 
             const hostname = new URL(url).hostname;
             return !(
-                hostname === "localhost" ||
+                // hostname === "localhost" ||
                 hostname.startsWith("127.") ||
                 hostname.startsWith("192.168.") ||
                 hostname.startsWith("10.")

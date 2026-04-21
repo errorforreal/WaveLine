@@ -104,7 +104,7 @@ async function connectToWs(wsUrl, connectionId){
                 $push : {events : ConnectionEvent}
             })
 
-            
+            notifyUi(connectionId, 'DISCONNECTED', 'SYSTEM');
             sessionMap.delete(connectionId);
             
             removeSocket(connectionId);
